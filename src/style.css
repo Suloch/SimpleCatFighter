@@ -1,0 +1,53 @@
+
+#canvas-container{
+  background-color: aqua;
+  display: flex;
+  justify-content: center;
+  height: 100vh;
+}
+
+canvas{
+  position: relative;
+  top: 50%;
+  translate: 0% -50%;
+  height: 70vh;
+  aspect-ratio: 2;
+  image-rendering: pixelated;
+}
+
+.health-bar{
+  position: absolute;
+  height: 4vh;
+  width: 40vh;
+  top: 18vh;
+  border: 1px brown solid;
+  border-radius: 2vh;
+  background-color: wheat;
+}
+
+.health-bar-left{
+  translate: -100% 0%;
+}
+
+.health-bar-right{
+  translate: 100% 0%;
+}
+
+
+.health-value {
+  position: absolute;
+  top: 49.85%;
+  transform: translate(-50%, -50%);
+  background-color: brown;
+  border-radius: 2vh;
+  height: 3.8vh;
+}
+
+
+.timer{
+  position: absolute;
+  font-size: 10vh;
+  top: 16vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+}
