@@ -1,6 +1,6 @@
 import { Animator } from "./animation";
 import { Physics, BoxCollider } from "./physics";
-import { input } from "./input";
+import { InputBuffer } from "./input";
 
 class Player {
 
@@ -9,6 +9,7 @@ class Player {
     animator: Animator = new Animator();
     charging: Boolean = false;
     grouded: Boolean = false;
+    inputBuffer: InputBuffer = new InputBuffer();
 
     constructor(){
         this.physics.gravity = 200;
@@ -35,25 +36,26 @@ class Player {
         this.animator.render(ctx, dt, this.physics.transform);
         this.collider.render(ctx);
     }
+
     moves(){
         if(this.charging){
         }
-        if(input.a && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['quickPunch', 'idle'])) return;
-        if(input.b && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['upperCut', 'idle']) ) return;
-        if(input.x && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['fightKick', 'idle']) ) return;
+        if(this.inputBuffer.a && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['quickPunch', 'idle'])) return;
+        if(this.inputBuffer.b && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['upperCut', 'idle']) ) return;
+        if(this.inputBuffer.x && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['fightKick', 'idle']) ) return;
 
-        if(input.up && this.grouded){
+        if(this.inputBuffer.up && this.grouded){
             this.physics.velocity.y = - 120;
             this.grouded = false;
             this.animator.playMultiple(['jumpstart', 'jumpair', 'jumpair', 'land', 'idle']);
         }
-        if(input.right ){
+        if(this.inputBuffer.right ){
             if(this.animator.cancelAndPlay(['idle'], 'walk') || this.animator.currentAnimationName == 'walk' || !this.grouded){
                 this.physics.transform.x += 1;
                 return;
             }
         }
-        if(input.left ){
+        if(this.inputBuffer.left ){
             if(this.animator.cancelAndPlay(['idle'], 'walk') || this.animator.currentAnimationName == 'walk' || !this.grouded){
                 this.physics.transform.x -= 1;
                 return;
@@ -65,6 +67,7 @@ class Player {
             }
         }
     }
+    
     update(dt: number){
         this.moves();
         this.physics.update(dt);

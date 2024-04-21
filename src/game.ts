@@ -1,8 +1,9 @@
 
-import { RemoteInput } from "./input";
 import { Physics, BoxCollider, world } from "./physics";
 import { Player } from "./player";
 import { HealthBar, Timer } from "./ui";
+import { Input } from "./input";
+import { RemoteInput, RemoteInputStatus } from "./remoteInput";
 
 class Ground{
 
@@ -43,23 +44,37 @@ export default class GameWindow{
     background: Background = new Background();
     healthBarPlayer1: HealthBar;
     timer: Timer ;
+    input: Input;
+    remoteInput: RemoteInput;
 
     constructor(){
         this.height = 128;
         this.width = 256;
         this.init();
 
-        this.startGameLoop();
-
+        
+        this.remoteInput = new RemoteInput(this.player.inputBuffer);
+        
         this.player2.animator.flipx = true;
         this.player2.physics.transform.x = 100;
         this.player2.collider.offset.x = 30;
-        this.player2.moves = () => {};
+        
+
+        this.remoteInput.onconnection = () => {
+            if(this.remoteInput.creator){
+                this.remoteInput.inputBuffer = this.player.inputBuffer
+                this.input = new Input(this.player2.inputBuffer, this.remoteInput.dataChannel);
+            }else{
+                this.remoteInput.inputBuffer = this.player2.inputBuffer
+                this.input = new Input(this.player.inputBuffer, this.remoteInput.dataChannel);
+            }
+            this.remoteInput.hideDomElements();
+            this.startGameLoop();
+        }
     }
 
     init(){
         let body = document.getElementsByTagName('body')[0];
-        
         
         let mainDiv = document.createElement('div');
         mainDiv.id = 'canvas-container'
@@ -77,10 +92,9 @@ export default class GameWindow{
         if(ctx != null){
             this.ctx = ctx;
         }
-        
-
     }
 
+    
 
     render(dt: number){
         this.background.render(this.ctx, dt);
