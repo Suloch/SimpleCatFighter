@@ -3,7 +3,7 @@ import { Physics, BoxCollider, world } from "./physics";
 import { Player } from "./player";
 import { HealthBar, Timer } from "./ui";
 import { Input } from "./input";
-import { RemoteInput, RemoteInputStatus } from "./remoteInput";
+import { RemoteInput } from "./remoteInput";
 
 class Ground{
 
@@ -53,24 +53,25 @@ export default class GameWindow{
         this.init();
 
         
-        this.remoteInput = new RemoteInput(this.player.inputBuffer);
+        // this.remoteInput = new RemoteInput(this.player.inputBuffer);
         
-        this.player2.animator.flipx = true;
-        this.player2.physics.transform.x = 100;
-        this.player2.collider.offset.x = 30;
-        
+        this.player2.flipHorizontally();
+        this.player2.physics.transform.x = 200;
+        this.player.physics.transform.x = 50;        
+        // this.remoteInput.onconnection = () => {
+        //     if(this.remoteInput.creator){
+        //         this.remoteInput.inputBuffer = this.player.inputBuffer
+        //         this.input = new Input(this.player2.inputBuffer, this.remoteInput.dataChannel);
+        //     }else{
+        //         this.remoteInput.inputBuffer = this.player2.inputBuffer
+        //         this.input = new Input(this.player.inputBuffer, this.remoteInput.dataChannel);
+        //     }
+        //     this.remoteInput.hideDomElements();
+        //     this.startGameLoop();
+        // }
 
-        this.remoteInput.onconnection = () => {
-            if(this.remoteInput.creator){
-                this.remoteInput.inputBuffer = this.player.inputBuffer
-                this.input = new Input(this.player2.inputBuffer, this.remoteInput.dataChannel);
-            }else{
-                this.remoteInput.inputBuffer = this.player2.inputBuffer
-                this.input = new Input(this.player.inputBuffer, this.remoteInput.dataChannel);
-            }
-            this.remoteInput.hideDomElements();
-            this.startGameLoop();
-        }
+        this.input = new Input(this.player2.inputBuffer, null);
+        this.startGameLoop();
     }
 
     init(){
@@ -106,7 +107,7 @@ export default class GameWindow{
     update(dt: number){
         this.player.update(dt);
         this.player2.update(dt);
-        this.healthBarPlayer1.udpate();
+        this.healthBarPlayer1.udpate(this.player.health, this.player2.health);
     }
 
     startGameLoop(){

@@ -31,12 +31,13 @@ class HealthBar{
 
     }
 
-    udpate(){
-        this.healthLDiv.style.width = this.healthL + '%';
-        this.healthLDiv.style.left = 50 - (100-this.healthL)/2 + '%';
+    udpate(p1Health: number, p2Health: number){
 
-        this.healthRDiv.style.width = this.healthR + '%';
-        this.healthRDiv.style.left = 50 + (100-this.healthR)/2 + '%';
+        this.healthLDiv.style.width = p1Health + '%';
+        this.healthLDiv.style.left = 50 - (100-p1Health)/2 + '%';
+
+        this.healthRDiv.style.width = p2Health + '%';
+        this.healthRDiv.style.left = 50 + (100-p2Health)/2 + '%';
     }
 
 }

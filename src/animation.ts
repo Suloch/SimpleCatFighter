@@ -40,7 +40,7 @@ class SpriteSheet{
 
 
 class Animation{
-
+    offset: Transform = new Transform();
     sheet: SpriteSheet
     animationData: Map<number, Frame>
     animationDataF: Map<number, Frame>
@@ -67,6 +67,8 @@ class Animation{
         
         this.prevFrame = this.animationData.get(0);
         this.maxFrame = i*10;
+        this.offset.x = -32;
+        this.offset.y = -40;
 
     }
 
@@ -81,9 +83,9 @@ class Animation{
             }
         }
         if(flipx){
-            ctx.drawImage(this.sheet.imageF, this.prevFrame.x, this.prevFrame.y, this.prevFrame.h, this.prevFrame.w, t.x, t.y, 64, 64);
+            ctx.drawImage(this.sheet.imageF, this.prevFrame.x, this.prevFrame.y, this.prevFrame.h, this.prevFrame.w, t.x+this.offset.x, t.y+this.offset.y, 64, 64);
         }else{
-            ctx.drawImage(this.sheet.image, this.prevFrame.x, this.prevFrame.y, this.prevFrame.h, this.prevFrame.w, t.x, t.y, 64, 64);
+            ctx.drawImage(this.sheet.image, this.prevFrame.x, this.prevFrame.y, this.prevFrame.h, this.prevFrame.w, t.x+this.offset.x, t.y+this.offset.y, 64, 64);
         }
         this.currentFrame = (this.currentFrame + this.speed) ;
         if(this.loop){
