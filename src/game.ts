@@ -1,6 +1,6 @@
 
 import { Physics, BoxCollider, world } from "./physics";
-import { Player } from "./player";
+import { FireBall, Player } from "./player";
 import { HealthBar, Timer } from "./ui";
 import { Input } from "./input";
 import { RemoteInput } from "./remoteInput";
@@ -38,8 +38,8 @@ export default class GameWindow{
     ctx : CanvasRenderingContext2D;
     height: number;
     width: number;
-    player: Player = new Player();
-    player2: Player = new Player();
+    player: Player = new Player('player1');
+    player2: Player = new Player('player2');
     ground: Ground = new Ground();
     background: Background = new Background();
     healthBarPlayer1: HealthBar;
@@ -57,7 +57,7 @@ export default class GameWindow{
         
         this.player2.flipHorizontally();
         this.player2.physics.transform.x = 200;
-        this.player.physics.transform.x = 50;        
+        this.player.physics.transform.x = 50; 
         // this.remoteInput.onconnection = () => {
         //     if(this.remoteInput.creator){
         //         this.remoteInput.inputBuffer = this.player.inputBuffer

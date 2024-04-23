@@ -1,33 +1,86 @@
-import { Animator } from "./animation";
-import { Physics, BoxCollider } from "./physics";
+import { PlayerAnimator, SpriteSheet, FireBallAnimator} from "./animation";
+import { Physics, BoxCollider, Transform } from "./physics";
 import { InputBuffer } from "./input";
+
+const playerSpriteSheet = new SpriteSheet('sprite', [4, 8, 8, 10, 9, 7, 6, 8, 13, 10, 12, 6, 8, 8, 8, 6], 64, 64, 1024);
+const fireSpriteSheet = new SpriteSheet('energy_effect_base', [7], 32, 32, 512);
+
+class FireBall{
+    physics : Physics = new Physics();
+    collider: BoxCollider = new BoxCollider(this.physics, 7, 7, 4, -4);
+    flipx : boolean = false;
+    animator: PlayerAnimator;
+
+    constructor(playerPosition: Transform, flip: boolean, speed: number, player: string){
+        this.animator = new FireBallAnimator(fireSpriteSheet, new Transform(0, -6, 0.5));
+        this.physics.transform.x = playerPosition.x;
+        this.physics.transform.y = playerPosition.y;
+        this.physics.gravity = 0;
+        this.collider.tag = 'fireball'+player;
+        this.physics.velocity.x = speed;
+        if(flip){
+            this.physics.velocity.x = -speed;
+            this.flipHorizontally();
+        }
+    }
+
+    render(ctx: CanvasRenderingContext2D, dt: number){
+        this.collider.render(ctx);
+        this.animator.render(ctx, dt, this.physics.transform);
+    }
+
+    update(dt: number){
+        this.physics.update(dt);
+    }
+
+    flipHorizontally(){
+        this.flipx = true;
+        this.animator.flipx = true;
+    }
+}
 
 
 class Player {
 
     physics : Physics = new Physics();
     collider: BoxCollider = new BoxCollider(this.physics, 9, 28, -4.5, -14);
-    animator: Animator = new Animator();
+    animator: PlayerAnimator;
     charging: Boolean = false;
+    chargingTime: number = 0;
     grouded: Boolean = false;
     inputBuffer: InputBuffer = new InputBuffer();
 
     hitboxes: Map<string, BoxCollider> = new Map();
     flipx : boolean = false;
     health: number = 100;
+    name : string;
 
-    constructor(){
+    fireballs: Array<FireBall>
+
+    constructor(name: string){
+        this.name = name;
+        this.animator = new PlayerAnimator(playerSpriteSheet, new Transform(-32, -40, 1));
+        
         this.physics.gravity = 200;
         this.physics.transform.y = 50;
         this.grouded = false;
-
+        
+        this.fireballs = []
         this.createHitboxes();
         
-
+        
         this.collider.onCollision = (col: BoxCollider, overlap: number, direction: string) => {
             if(col.tag == 'Ground'){
                 this.grouded = true;
-
+                
+            }
+            if(col.tag.includes('fireball') ){
+                if(col.tag.includes(this.name)){
+                    return
+                }
+                this.health = this.health - 10;
+                this.physics.transform.x = Math.ceil(this.physics.transform.x - overlap);
+                col.active = false;
             }
             if(direction == 'Y'){
                 this.physics.velocity.y = 0;
@@ -43,6 +96,7 @@ class Player {
                 this.health = this.health - 10;
                 col.active = false;
             }
+            
 
         }
     }
@@ -70,11 +124,12 @@ class Player {
     }
 
     render(ctx: CanvasRenderingContext2D, dt: number){
+        for(let fireball of this.fireballs){
+            fireball.render(ctx, dt);
+        }
         this.physics.render(ctx);
         this.animator.render(ctx, dt, this.physics.transform);
         this.collider.render(ctx);
-        this.hitboxes.get('quickPunch').render(ctx);
-        this.hitboxes.get('upperCut').render(ctx);
     }
 
     activateHitbox(name: string, delay: number, activeTime: number): boolean{
@@ -93,6 +148,17 @@ class Player {
 
     moves(){
         if(this.charging){
+            this.chargingTime += 10;
+            if(!this.inputBuffer.y){
+                if(this.chargingTime > 200){
+                    this.animator.cancelAndPlayMultiple(['charging'], ['fire', 'idle']);
+                    setTimeout(()=>{this.fireballs.push(new FireBall(this.physics.transform, this.flipx, 100, this.name))}, 200) ;
+                }
+                this.animator.cancelAndPlay(['charging', 'chargingStart'], 'idle');
+                this.charging = false;
+                this.chargingTime = 0;
+            }
+            return;
         }
         if(this.inputBuffer.a 
             && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['quickPunch', 'idle']) 
@@ -105,6 +171,12 @@ class Player {
         if(this.inputBuffer.x && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['fightKick', 'idle']) 
             && this.activateHitbox('fightKick', 200, 150)
         ) return;
+
+        if(this.inputBuffer.y && this.animator.cancelAndPlayMultiple(['idle', 'walk'], ['chargingStart', 'charging'])
+        ) {
+            this.charging = true;
+            return;
+        }
 
         if(this.inputBuffer.up && this.grouded){
             this.physics.velocity.y = - 120;
@@ -135,11 +207,27 @@ class Player {
             if(this.animator.currentAnimationName != 'die'){
                 this.animator.play('die');
             }
-            return
+            return;
         }
+        let indices_to_delete = []
+        for(let i = 0; i < this.fireballs.length;  i++){
+                if(this.fireballs[i].physics.transform.x > -100 && this.fireballs[i].physics.transform.x < 400){
+                this.fireballs[i].update(dt);
+            }else{
+                indices_to_delete.push(i);
+            }
+            if(!this.fireballs[i].collider.active){
+                this.fireballs[i].physics.velocity.x = 0;
+                this.fireballs[i].animator.cancelAndPlay(['fireStart'], 'fireDisappear');
+                if(this.fireballs[i].animator.currentAnimationName == 'fireDisappear', !this.fireballs[i].animator.playing){
+                    indices_to_delete.push(i);
+                }
+            }
+        }
+        this.fireballs  = this.fireballs.filter((_, index)=>{ return !indices_to_delete.includes(index)});
         this.moves();
         this.physics.update(dt);
     }
 }
 
-export {Player};
+export {Player, FireBall};

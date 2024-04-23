@@ -5,6 +5,12 @@ class Transform{
     y: number = 0;
 
     scale: number = 1;
+
+    constructor(x: number, y: number, scale: number){
+        this.x = x;
+        this.y = y;
+        this.scale = scale;
+    }
 }
 
 class Velocity{
@@ -60,7 +66,7 @@ const world = new World();
 class BoxCollider{
     active = true;
     physics : Physics;
-    offset: Transform =  new Transform();
+    offset: Transform =  new Transform(0, 0, 1);
     onCollision: Function = () => {};
     tag: String = '';
 
@@ -87,7 +93,7 @@ class BoxCollider{
 };
 
 class Physics{
-    transform: Transform = new Transform();
+    transform: Transform = new Transform(0, 0, 1);
     velocity: Velocity = new Velocity();
     gravity: number = 10;
 
