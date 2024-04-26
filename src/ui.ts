@@ -43,7 +43,8 @@ class HealthBar{
 }
 
 class Timer{
-    time: Number = 60;
+    time: number = 60;
+    accumulator: number = 0;
     timerElement: HTMLDivElement
     constructor(body: HTMLDivElement){
         this.timerElement = document.createElement('div');
@@ -54,8 +55,17 @@ class Timer{
 
     }
 
-    update(time: Number){
-        this.time = time;
+    update(dt: number){
+        
+        if(dt > 1000){
+            return;
+        }
+        this.accumulator += dt;
+        if(this.accumulator >= 1000){
+            this.accumulator = this.accumulator - 1000;
+            this.time -= 1;
+        }
+
         this.timerElement.innerText = ("00" + this.time).slice(-2);
     }
 }

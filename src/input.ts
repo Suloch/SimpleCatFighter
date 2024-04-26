@@ -10,6 +10,8 @@ class InputBuffer{
     b: Boolean = false;
     x: Boolean = false;
     y: Boolean = false;
+    
+    start: Boolean = false;
 
     constructor(){
         
@@ -19,7 +21,7 @@ class InputBuffer{
  class Input{
     constructor(inputBuffer: InputBuffer, dataChannel: RTCDataChannel){
         document.addEventListener('keydown', (event) => {
-            // dataChannel.send(JSON.stringify({k: event.key, d: true}))
+            dataChannel.send(JSON.stringify({k: event.key, d: true}))
             switch(event.key){
                 case 'a':
                 case 'A': inputBuffer.left = true; break;
@@ -37,11 +39,13 @@ class InputBuffer{
                 case 'J': inputBuffer.x = true; break;
                 case 'k':
                 case 'K': inputBuffer.y = true; break;
+                case ' ': inputBuffer.start = true; break;
+
             }
         })
 
         document.addEventListener('keyup', (event) => {
-            // dataChannel.send(JSON.stringify({k:event.key, d: false}))
+            dataChannel.send(JSON.stringify({k:event.key, d: false}))
             switch(event.key){
                 case 'a':
                 case 'A': inputBuffer.left = false; break;
@@ -59,6 +63,7 @@ class InputBuffer{
                 case 'J': inputBuffer.x = false; break;
                 case 'k':
                 case 'K': inputBuffer.y = false; break;
+                case ' ': inputBuffer.start = false; break;
             }
         })
     }

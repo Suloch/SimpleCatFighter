@@ -149,6 +149,7 @@ class RemoteInput{
             case 'J': this.inputBuffer.x = data.d; break;
             case 'k':
             case 'K': this.inputBuffer.y = data.d; break;
+            case ' ': this.inputBuffer.start = data.d; break;
         }
     }
 

@@ -1,5 +1,5 @@
 import { PlayerAnimator, SpriteSheet, FireBallAnimator} from "./animation";
-import { Physics, BoxCollider, Transform } from "./physics";
+import { Physics, BoxCollider, Transform, world } from "./physics";
 import { InputBuffer } from "./input";
 
 const playerSpriteSheet = new SpriteSheet('sprite', [4, 8, 8, 10, 9, 7, 6, 8, 13, 10, 12, 6, 8, 8, 8, 6], 64, 64, 1024);
@@ -49,6 +49,8 @@ class Player {
     chargingTime: number = 0;
     grouded: Boolean = false;
     inputBuffer: InputBuffer = new InputBuffer();
+
+    ready: Boolean = false;
 
     hitboxes: Map<string, BoxCollider> = new Map();
     flipx : boolean = false;
@@ -200,6 +202,13 @@ class Player {
                 this.animator.play('idle');
             }
         }
+    }
+
+    updateReadyStatus(){
+	    
+	if(this.inputBuffer.start){
+		this.ready = true;
+	}
     }
 
     update(dt: number){
