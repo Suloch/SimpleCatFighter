@@ -2,7 +2,7 @@
 import { InputBuffer } from "./input";
 
 class Signaling{
-    socket: WebSocket = new WebSocket("ws://localhost:8765");
+    socket: WebSocket = new WebSocket("wss://rtcsignalcatfighter-z7e4jwfgoq-em.a.run.app");
     constructor(){
     }
 
