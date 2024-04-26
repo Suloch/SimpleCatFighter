@@ -55,7 +55,6 @@ canvas{
 .connection-modal{
   position: absolute;
   top: 30%;
-  display: none;
   left: 40%;
   z-index: 1;
   translate: 0% 0%;
