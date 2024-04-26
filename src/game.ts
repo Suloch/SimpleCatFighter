@@ -168,6 +168,8 @@ export default class GameWindow{
         document.getElementById('result-container').style.display = 'none';
 
         let prevTime = 0;
+        let deadWaitTime = 0;
+
         let animate = (timestamp: number) =>{
 
             let dt = timestamp - prevTime;
@@ -178,10 +180,13 @@ export default class GameWindow{
                 this.render(dt);
                 this.timer.update(dt);
                 if(this.timer.time <=0 || this.player.health <= 0 || this.player2.health <= 0){
-                    this.displayResult();
-                    this.player2.ready = false;
-                    this.player.ready = false;
-                    return;
+                    deadWaitTime += dt;
+                    if(deadWaitTime > 2000){
+                        this.displayResult();
+                        this.player2.ready = false;
+                        this.player.ready = false;
+                        return;
+                    }
                 }
                 prevTime = timestamp;
             }

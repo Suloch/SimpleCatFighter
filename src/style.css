@@ -81,6 +81,8 @@ canvas{
   margin-top: 5%;
   text-align: center;
   position: relative;
+
+  translate: -25% 0%;
   left: 33%;
   color: bisque;
   font-size: 10vh;
