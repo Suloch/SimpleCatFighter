@@ -22,6 +22,37 @@ class Ground{
     }
 }
 
+class LeftWall{
+    physics: Physics = new Physics();
+    collider: BoxCollider = new BoxCollider(this.physics, 20, 500, 0, 0);
+
+    constructor(){
+        this.physics.transform.x = -18;
+        this.physics.transform.y = 0;
+        this.physics.gravity = 0;
+        this.collider.tag = 'left-wall';
+    }
+    render(ctx: CanvasRenderingContext2D, dt: number){
+        this.collider.render(ctx);
+    }
+}
+
+class RightWall{
+    physics: Physics = new Physics();
+    collider: BoxCollider = new BoxCollider(this.physics, 20, 500, 100, 0);
+
+
+    constructor(){
+        this.physics.transform.x = 155;
+        this.physics.transform.y = 0;
+        this.physics.gravity = 0;
+        this.collider.tag = 'left-wall';
+    }
+    render(ctx: CanvasRenderingContext2D, dt: number){
+        this.collider.render(ctx);
+    }
+}
+
 class Background{
     image: HTMLImageElement
     constructor(){
@@ -41,6 +72,8 @@ export default class GameWindow{
     player: Player = new Player('player1');
     player2: Player = new Player('player2');
     ground: Ground = new Ground();
+    leftWall: LeftWall = new LeftWall();
+    rightWall: RightWall = new RightWall();
     background: Background = new Background();
     healthBarPlayer1: HealthBar;
     timer: Timer ;
@@ -74,8 +107,10 @@ export default class GameWindow{
             this.tipDiv.style.display = 'block';
         }
 
-        // this.input = new Input(this.player2.inputBuffer, null);
         // this.startGameLoop();
+        // this.player.ready = true;
+        // this.input = new Input(this.player2.inputBuffer, null);
+        // this.player2.ready = true;
     }
 
     init(){
@@ -114,14 +149,23 @@ export default class GameWindow{
     render(dt: number){
         this.background.render(this.ctx, dt);
         this.ground.render(this.ctx, dt);
+        this.leftWall.render(this.ctx, dt);
+        this.rightWall.render(this.ctx, dt);
         this.player.render(this.ctx, dt);
         this.player2.render(this.ctx, dt);
     }
 
     update(dt: number){
+        this.healthBarPlayer1.udpate(this.player.health, this.player2.health);
+        if(
+            (this.player2.flipx && this.player2.physics.transform.x < this.player.physics.transform.x) 
+            || (!this.player2.flipx && this.player2.physics.transform.x > this.player.physics.transform.x)
+        ){
+            this.player.flipHorizontally();
+            this.player2.flipHorizontally();
+        }
         this.player.update(dt);
         this.player2.update(dt);
-        this.healthBarPlayer1.udpate(this.player.health, this.player2.health);
     }
 
     displayResult(){
@@ -150,6 +194,8 @@ export default class GameWindow{
             this.player.ready = false; 
             this.player2.ready = false;
             this.player2.health = 100;
+            this.player2.physics.transform.x = 200;
+            this.player.physics.transform.x = 20;
             this.player.health = 100;
             this.timer.time = 60;
             this.startGameLoop();
@@ -176,8 +222,8 @@ export default class GameWindow{
 
             if( dt > 20 || prevTime == 0){
                 world.checkCollision();
-                this.update(20);
                 this.render(dt);
+                this.update(20);
                 this.timer.update(dt);
                 if(this.timer.time <=0 || this.player.health <= 0 || this.player2.health <= 0){
                     deadWaitTime += dt;

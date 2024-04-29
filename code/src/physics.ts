@@ -37,7 +37,7 @@ class World{
                     let box2ymax = this.colliders[j].physics.transform.y+this.colliders[j].offset.y+this.colliders[j].h;
                     
                     
-                    let xOverlap1 =   box2xmax - box1xmin;
+                    let xOverlap1 = box2xmax - box1xmin;
                     let xOveralp2 = box1xmax - box2xmin;
     
                     let yOverlap1 = box2ymax - box1ymin;
@@ -46,14 +46,25 @@ class World{
                     let xOverlap = Math.min(xOverlap1, xOveralp2);
                     let yOverlap = Math.min(yOverlap1, yOverlap2);
                     if(xOverlap > 0 && yOverlap > 0){
-                        
-                        let maxOverlap = Math.min(xOverlap, yOverlap);
+                        let maxOverlap: number, direction: string, factor: number = -1; 
+                        if(xOverlap < yOverlap){
+                            maxOverlap = xOverlap;
+                            direction = 'X';
+                            if(box1xmin < box2xmin){
+                                factor = 1;
+                            }
+                        }else{
+                            maxOverlap = yOverlap;
+                            direction = 'Y';
+                            if(box1ymin < box2ymin){
+                                factor = 1;
+                            }
+                        }
     
-                        let direction = xOverlap  > yOverlap ? 'Y' : 'X';
                         
     
-                        this.colliders[i].onCollision(this.colliders[j], maxOverlap, direction);
-                        this.colliders[j].onCollision(this.colliders[i], -maxOverlap, direction);
+                        this.colliders[i].onCollision(this.colliders[j], factor*maxOverlap, direction);
+                        this.colliders[j].onCollision(this.colliders[i], factor*-maxOverlap, direction);
                     }
                 }
             }
@@ -73,7 +84,7 @@ class BoxCollider{
     h: number = 1;
     w: number = 1;
 
-    show: Boolean = true;
+    show: Boolean = false;
 
     constructor(p: Physics, w:number, h:number, offx: number, offy: number){
         this.physics = p;

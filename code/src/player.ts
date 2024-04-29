@@ -104,8 +104,8 @@ class Player {
     }
 
     flipHorizontally(){
-        this.flipx = true;
-        this.animator.flipx = true;
+        this.flipx = !this.flipx;
+        this.animator.flipx = this.flipx;
         this.hitboxes.forEach((col: BoxCollider, key: string)=>{
             col.offset.x = -col.offset.x;
         });
